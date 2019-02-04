@@ -10,7 +10,7 @@ const incomeTaxRates = [
 
 const medicareLevyIndividualRates = [
   {min: 0, max: 21980, rate: 0, rateType: 'marginal'},
-  {min: 21981, max: 27476, rate: .1, rateType: 'marginal'},
+  {min: 21981, max: 27475, rate: .1, rateType: 'marginal'},
   {min: 27476, max: Infinity, rate: .02, rateType: 'average'}
 ];
 
