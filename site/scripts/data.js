@@ -68,4 +68,4 @@ const litoRates = [
   {min: 66668, max: Infinity, rate: 0, rateType: 'marginal'}
 ]
 
-const litoBase = -200;
+const litoBase = -445;

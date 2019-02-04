@@ -3,33 +3,62 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>
+    <script src="scripts/calculations.js"></script>
+    <script src="scripts/data.js"></script>
+    <script src="scripts/view.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles/style.css"/>
   </head>
   <body>
     <form>
       <div>
         <label for="name">Taxable income:</label>
-        <input type="number" id="income-field" min="0">
+        <input type="number" id="income-field" min="0" onchange="refresh()" step="1000">
       </div>
       <div>
         <label for="name">HELP debt:</label>
-        <input type="checkbox" id="help-field">
+        <input type="checkbox" id="help-checkbox" onchange="refresh()">
       </div>
       <div>
         <label for="name">Hospital cover:</label>
-        <input type="checkbox" id="hospital-cover-field">
+        <input type="checkbox" id="hospital-cover-checkbox" onchange="refresh()">
       </div>
       <div>
         <label for="name">Lodging as a family:</label>
-        <input type="checkbox" id="family-field">
+        <input type="checkbox" id="family-checkbox" onchange="refresh()">
       </div>
       <div>
         <label for="name">Family income:</label>
-        <input type="number" id="family-income-field" min="0">
+        <input type="number" id="family-income-field" min="0" disabled onchange="refresh()" step="1000">
       </div>
       <div>
         <label for="name">Number of dependents:</label>
-        <input type="number" id="dependents-field" min="0">
+        <input type="number" id="dependents-field" min="0" disabled onchange="refresh()">
       </div>
     </form>
+
+    <div>
+      Income tax: $<span id="income-tax-box"></span>
+    </div>
+    <div>
+      Low-income tax offset: $<span id="lito-box"></span>
+    </div>
+    <div>
+      Low- and middle-income tax offset: $<span id="lmito-box"></span>
+    </div>
+    <div>
+      HELP debt repayment: $<span id="help-box"></span>
+    </div>
+    <div>
+      Medicare levy: $<span id="medicare-box"></span>
+    </div>
+    <div>
+      Medicare levy surcharge: $<span id="medicare-surcharge-box"></span>
+    </div>
+    <div>
+      <strong>Total tax: $<span id="total-tax-box"></span></strong>
+    </div>
+    <div>
+      <strong>Disposable income: $<span id="disposable-income-box"></span></strong>
+    </div>
   </body>
 </html>

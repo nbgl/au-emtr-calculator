@@ -1,5 +1,9 @@
 "use strict";
 
+function to2dp(x) {
+  return Math.round(x * 100) / 100;
+}
+
 function amountFromRates(input, rates) {
   let total = 0
   let oldMax = 0;
@@ -29,23 +33,27 @@ function findRate(input, rates) {
 }
 
 function calculateIncomeTax(taxableIncome) {
-  return amountFromRates(taxableIncome, incomeTaxRates);
+  return to2dp(amountFromRates(taxableIncome, incomeTaxRates));
 }
 
 function calculateLmito(taxableIncome, incomeTax) {
   let result = lmitoBase + amountFromRates(taxableIncome, lmitoRates);
   result = Math.max(result, -incomeTax);
-  return result;
+  return to2dp(result);
 }
 
 function calculateLito(taxableIncome, incomeTax) {
   let result = litoBase + amountFromRates(taxableIncome, litoRates);
   result = Math.max(result, -incomeTax);
-  return result;
+  return to2dp(result);
 }
 
-function calculateHelp(taxableIncome) {
-  return amountFromRates(taxableIncome, helpRepaymentRates);
+function calculateHelp(taxableIncome, hasHelpDebt) {
+  if (hasHelpDebt) {
+    return to2dp(amountFromRates(taxableIncome, helpRepaymentRates));
+  } else {
+    return 0;
+  }
 }
 
 function offsetBrackets(rates, offset) {
@@ -80,7 +88,7 @@ function calculateMedicare(taxableIncome, familyIncome, isFamily, numChildren) {
   } else {
     rate = findRate(taxableIncome, medicareLevyIndividualRates);
   }
-  return rate * taxableIncome;
+  return to2dp(rate * taxableIncome);
 }
 
 function calculateMedicareSurcharge(taxableIncome, familyIncome,
@@ -99,6 +107,21 @@ function calculateMedicareSurcharge(taxableIncome, familyIncome,
     } else {
       rate = findRate(taxableIncome, medicareLevySurchargeIndividualRates);
     }
-    return rate * taxableIncome;
+    return to2dp(rate * taxableIncome);
   }
+}
+
+function calculateTotalTax(taxableIncome, hasHelpDebt, familyIncome,
+                           isFamily, numChildren, hasHealthCover) {
+  const incomeTax = calculateIncomeTax(taxableIncome);
+  const lito = calculateLito(taxableIncome, incomeTax);
+  const lmito = calculateLmito(taxableIncome, incomeTax + lito);
+  const helpAmt = calculateHelp(taxableIncome, hasHelpDebt);
+  const medicare = calculateMedicare(taxableIncome, familyIncome,
+                                     isFamily, numChildren);
+  const medicareSurcharge = calculateMedicareSurcharge(
+    taxableIncome, familyIncome, isFamily,
+    numChildren, hasHealthCover);
+
+  return incomeTax + lito + lmito + helpAmt + medicare + medicareSurcharge;
 }
