@@ -85,8 +85,133 @@ function refreshCalculation(info) {
   disposableIncomeBox.innerHTML = disposableIncome;
 }
 
+const PLOT_MAX_INCOME = 250000;
+const PLOT_STEP = 1000;
+function drawPlots(info) {
+  const incomes = [];
+  const taxes = [];
+  const disposableIncomes = [];
+  for (let income = 0; income <= PLOT_MAX_INCOME; income += PLOT_STEP) {
+    const tax = calculateTotalTax(
+      income, info.hasHelp, info.familyIncome,
+      info.family, info.dependents, info.hospitalCover);
+    const disposableIncome = income - tax;
+    incomes.push(income);
+    taxes.push(tax);
+    disposableIncomes.push(disposableIncome);
+  }
+
+  const emtrXs = [];
+  const emtrs = []
+  for (let i = 0; i < incomes.length - 1; ++i) {
+    const income0 = incomes[i];
+    const income1 = incomes[i + 1];
+    const tax0 = taxes[i];
+    const tax1 = taxes[i + 1];
+    const emtrX = (income0 + income1) / 2; // Average incomes.
+    const emtr = (tax1 - tax0) / (income1 - income0);
+    emtrXs.push(emtrX);
+    emtrs.push(emtr);
+  }
+
+  plotDisposableIncome(incomes, disposableIncomes);
+  plotEmtr(emtrXs, emtrs);
+}
+
+function plotDisposableIncome(incomes, disposableIncomes) {
+  const ctx = document.getElementById("disposable-income-chart").getContext('2d');
+  const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: incomes,
+        datasets: [{
+          data: disposableIncomes,
+          borderColor: '#000',
+          pointRadius: 0,
+          fill: false,
+          lineTension: 0
+        }]
+      },
+      options: {
+        legend: {
+          display: false
+        },
+        animation: false,
+        title: {
+          display: true,
+          text: 'Disposable income as a function of taxable income'
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Taxable income ($)'
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Disposable income ($)'
+            },
+            ticks: {
+              suggestedMin: 0,
+            }
+          }]
+        }
+      }
+    });
+}
+function plotEmtr(emtrXs, emtrs) {
+  const ctx = document.getElementById("emtr-chart").getContext('2d');
+  const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: emtrXs,
+        datasets: [{
+          data: emtrs,
+          borderColor: '#000',
+          pointRadius: 0,
+          fill: false,
+          lineTension: 0
+        }]
+      },
+      options: {
+        legend: {
+          display: false
+        },
+        animation: false,
+        title: {
+          display: true,
+          text: 'EMTR as a function of taxable income'
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'Taxable income ($)'
+            },
+            ticks: {
+              suggestedMin: 0,
+            }
+          }],
+          yAxes: [{
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: 'EMTR'
+            }
+          }]
+        }
+      }
+    });
+}
+
 function refresh() {
   refreshFamilyFields();
   const info = getInfoFromInput();
   refreshCalculation(info);
+  drawPlots(info);
 }
